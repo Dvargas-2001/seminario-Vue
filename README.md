@@ -1,19 +1,24 @@
-# seminario-Vue
-## Descripción
-Este repositorio corresponde al proyecto del seminario sobre **Vue.js**.  
-Actualmente se encuentra en la **fase 1**, que incluye la elaboración del plan del proyecto.
+# demo
 
-## Integrantes
-- Gilary Daniela Vargas Hurtado
-- Luz kenyeli Mina Valencia
-- Cristian Obispo
-- Hernado Tovar Alzate
+## Project setup
+```
+npm install
+```
 
-## Contenido
-- `/documentos` → Contiene el plan del proyecto en PDF.  
-- (Más adelante se agregarán carpetas para código, presentaciones y otros recursos).
+### Compiles and hot-reloads for development
+```
+npm run serve
+```
 
-##  Estado
-✅ Fase 1 completada: Plan del proyecto
-⬜ Fase 2: Desarrollo en Vue  
-⬜ Fase 3: Presentación final
+### Compiles and minifies for production
+```
+npm run build
+```
+
+### Lints and fixes files
+```
+npm run lint
+```
+
+### Customize configuration
+See [Configuration Reference](https://cli.vuejs.org/config/).
