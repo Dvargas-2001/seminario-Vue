@@ -1,8 +1,6 @@
 
 # Vue 3 + Vite
 
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
-=======
 # 📚 Seminario Vue
 
 ## ¡[Descripción](https://i.pinimg.com/1200x/95/69/c3/9569c314118024c24bc85874f5dc8fab.jpg)
@@ -12,7 +10,7 @@ El objetivo es crear una aplicación web que muestre productos de manera interac
 incluyendo navegación, tarjetas con información y un carrito de compras básico.  
 
 
-## ¡[Integrantes] (https://i.pinimg.com/736x/63/f0/47/63f0477aec61cef7de40f454452b742e.jpg)
+## ¡[Integrantes](https://i.pinimg.com/736x/63/f0/47/63f0477aec61cef7de40f454452b742e.jpg)
 - Gilary Daniela Vargas Hurtado  
 - Luz Keyeli Mina Valencia
 - Cristian Obispo
