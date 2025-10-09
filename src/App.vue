@@ -1,18 +1,19 @@
 <template>
   <div>
+    <!-- Menú de navegación -->
     <NavBar :cartCount="cartCount" />
-    <h1>Bienvenido a mi tienda</h1>
-    <ProductList @add-to-cart="increaseCart" />
+
+    <!-- Aquí se mostrarán las vistas -->
+    <router-view @add-to-cart="increaseCart" />
   </div>
 </template>
 
 <script>
 import NavBar from "./components/NavBar.vue";
-import ProductList from "./components/ProductList.vue";
 
 export default {
   name: "App",
-  components: { NavBar, ProductList },
+  components: { NavBar },
   data() {
     return {
       cartCount: 0

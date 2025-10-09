@@ -1,58 +1,56 @@
 <template>
-  <nav>
-    <a href="#">Inicio</a>
-    <a href="#">Productos</a>
-    <a href="#">Acerca</a>
-    <a href="#">Contacto</a>
+  <nav class="navbar">
+    <span class="titulo">Sistema de Control Vehicular</span>
 
-    <div class="cart">
-      🛒 <span>{{ cartCount }}</span>
-    </div>
+    <ul class="menu">
+      <li><router-link to="/">Inicio</router-link></li>
+      <li><router-link to="/registro-vehiculo">Vehículos</router-link></li>
+      <li><router-link to="/registro-ruta">Rutas</router-link></li>
+      <li><router-link to="/api-test">Conexión API</router-link></li>
+    </ul>
   </nav>
 </template>
 
-<script>
-export default {
-  name: "NavBar",
-  props: {
-    cartCount: {
-      type: Number,
-      default: 0
-    }
-  }
-}
-</script>
-
 <style scoped>
-nav {
-  background-color: #2c3e50;
-  padding: 1rem;
+.navbar {
+  background: rgba(30, 58, 138, 0.75); /* azul translúcido */
+  backdrop-filter: blur(8px);
   display: flex;
-  gap: 1rem;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
+  padding: 15px 0;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
 }
 
-nav a {
+.titulo {
   color: white;
-  font-weight: bold;
+  font-size: 22px;
+  font-weight: 800;
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.menu {
+  display: flex;
+  list-style: none;
+  gap: 35px;
+  margin: 0;
+  padding: 0;
+}
+
+.menu a {
+  color: white;
   text-decoration: none;
-  transition: color 0.3s;
+  font-weight: 500;
+  transition: 0.3s;
 }
 
-nav a:hover {
-  color: #f39c12;
-}
-
-.cart {
-  color: white;
-  font-size: 1.2rem;
-}
-.cart span {
-  background: #f39c12;
-  padding: 0.2rem 0.6rem;
-  border-radius: 50%;
-  font-weight: bold;
-  margin-left: 0.3rem;
+.menu a:hover {
+  color: #a5f3fc; /* azul celeste */
 }
 </style>

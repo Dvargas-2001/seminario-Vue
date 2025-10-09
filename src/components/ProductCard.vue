@@ -1,9 +1,12 @@
 <template>
   <div class="card">
-    <img :src="image" alt="Imagen del producto" />
+    <img :src="image" :alt="`Imagen de ${name}`" />
     <h3>{{ name }}</h3>
-    <p>Precio: ${{ price }}</p>
-    <button @click="$emit('add-to-cart', { name, price })">
+    <p>Precio: ${{ price.toFixed(2) }}</p>
+    <button 
+      @click="$emit('add-to-cart', { id, name, price, image })"
+      :aria-label="`Agregar ${name} al carrito`"
+    >
       🛒 Agregar al carrito
     </button>
   </div>
@@ -13,11 +16,22 @@
 export default {
   name: "ProductCard",
   props: {
-    name: String,
-    price: Number,
+    id: {
+      type: [String, Number],
+      required: true
+    },
+    name: {
+      type: String,
+      required: true
+    },
+    price: {
+      type: Number,
+      required: true,
+      validator: value => value >= 0
+    },
     image: {
       type: String,
-      default: "https://via.placeholder.com/150" // 👈 imagen por defecto
+      default: "https://via.placeholder.com/150"
     }
   }
 }
@@ -30,7 +44,8 @@ export default {
   padding: 1rem;
   margin: 0.5rem;
   background-color: #f9f9f9;
-  width: 200px;
+  width: 100%;
+  max-width: 220px;
   text-align: center;
   transition: transform 0.2s, box-shadow 0.2s;
 }
@@ -42,6 +57,7 @@ export default {
 
 .card img {
   width: 100%;
+  height: auto;
   border-radius: 6px;
   margin-bottom: 0.5rem;
 }
