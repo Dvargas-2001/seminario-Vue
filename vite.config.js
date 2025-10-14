@@ -15,7 +15,7 @@ export default defineConfig({
         target: 'http://apirecoleccion.gonzaloandreslucio.com',
         changeOrigin: true,
         secure: false,
-      }
-    }
-  }
+      },
+    },
+  },
 })

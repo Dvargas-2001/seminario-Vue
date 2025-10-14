@@ -6,7 +6,6 @@
       <li><router-link to="/">Inicio</router-link></li>
       <li><router-link to="/registro-vehiculo">Vehículos</router-link></li>
       <li><router-link to="/registro-ruta">Rutas</router-link></li>
-      <li><router-link to="/api-test">Conexión API</router-link></li>
     </ul>
   </nav>
 </template>

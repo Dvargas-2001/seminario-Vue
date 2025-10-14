@@ -1,0 +1,7 @@
+{
+  "calles": [
+    { "id": 1, "nombre": "Calle 1" },
+    { "id": 2, "nombre": "Calle 2" },
+    { "id": 3, "nombre": "Calle 3" }
+  ]
+}

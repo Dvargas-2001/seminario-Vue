@@ -1,7 +1,5 @@
 # Vue 3 + Vite  
 
-# 📚 Seminario Vue  
-
 ## Integrantes  
 ![Integrantes](https://i.pinimg.com/736x/63/f0/47/63f0477aec61cef7de40f454452b742e.jpg)  
 

@@ -1,112 +1,165 @@
 <template>
   <div class="inicio">
     <div class="contenido">
-      <!-- IZQUIERDA -->
       <div class="texto">
-        <h1 class="titulo"> Sistema de Control Vehicular</h1>
+        <h1 class="titulo">Sistema de Control Vehicular</h1>
         <p class="descripcion">
           Control, seguridad y rendimiento para una movilidad eficiente.
         </p>
-        <router-link to="/registro-vehiculo" class="boton">
-          Comenzar
-        </router-link>
+
+        <!-- Botones principales -->
+<div class="botones">
+  <router-link to="/registro-vehiculo" class="boton registrar">
+    Registrar Vehículo
+  </router-link>
+
+  <router-link to="/registro-ruta" class="boton registrar">
+    Registrar Ruta
+  </router-link>
+
+  <router-link to="/api-test" class="boton registrar">
+    Ver Lista de Vehículos
+  </router-link>
+
+  <button @click="probarConexion" class="boton conexion">
+    🔗 Probar Conexión API
+  </button>
+</div>
+
+        <!-- Mensaje de estado -->
+        <p v-if="mensaje" :class="estadoClase" class="mensaje-api">{{ mensaje }}</p>
       </div>
 
-      <!-- DERECHA: LOGO -->
+      <!-- Imagen decorativa -->
       <div class="imagen">
-        <div class="circulo"></div>
-        <img :src="logo" alt="Logo Principal" class="logo-img" />
+        <img src="@/assets/api.jpeg" alt="API Imagen" />
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import logo from '@/assets/logo2.png'
+import { ref } from 'vue'
+import axios from 'axios'
+
+const mensaje = ref('')
+const estadoClase = ref('')
+
+// Función para probar la conexión a la API
+const probarConexion = async () => {
+  try {
+    mensaje.value = '⏳ Probando conexión...'
+    estadoClase.value = 'pendiente'
+
+    const response = await axios.get('http://apirecoleccion.gonzaloandreslucio.com/api')
+    if (response.status === 200) {
+      mensaje.value = '✅ Conexión exitosa con la API'
+      estadoClase.value = 'exito'
+    } else {
+      mensaje.value = '⚠️ La API respondió, pero con un error'
+      estadoClase.value = 'error'
+    }
+  } catch (error) {
+    mensaje.value = '❌ Error: No se pudo conectar con la API'
+    estadoClase.value = 'error'
+  }
+}
 </script>
 
 <style scoped>
 .inicio {
-  background: linear-gradient(120deg, #f8fafc 0%, #e6fff7 100%);
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding-top: 100px;
-  padding: 60px 20px;
+  background: linear-gradient(120deg, #f8fafc 0%, #e0f7fa 100%);
+  padding: 50px 20px;
 }
 
 .contenido {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 70px;
-  max-width: 1250px;
+  gap: 50px;
+  max-width: 1100px;
   width: 100%;
 }
 
-/* TEXTO */
 .texto {
   flex: 1;
-  z-index: 2;
 }
 
-.titulo {
-  font-size: 45px;
-  font-weight: 800;
-  color: #1e3a8a;
-  margin-bottom: 20px;
-}
-
-.descripcion {
-  font-size: 18px;
-  color: #374151;
-  max-width: 460px;
-  margin-bottom: 30px;
-  line-height: 1.5;
-}
-
-.boton {
-  display: inline-block;
-  padding: 14px 36px;
-  background-color: #1e3a8a;
-  color: white;
-  border-radius: 8px;
-  text-decoration: none;
-  font-weight: 600;
-  transition: all 0.3s;
-}
-
-.boton:hover {
-  background-color: #162a6b;
-  transform: scale(1.05);
-}
-
-/* IMAGEN */
 .imagen {
-  position: relative;
   flex: 1;
   display: flex;
   justify-content: center;
-  align-items: center;
 }
 
-.circulo {
-  position: absolute;
-  width: 500px;
-  height: 500px;
-  border-radius: 50%;
-  background: radial-gradient(circle at center, rgba(56, 189, 248, 0.4), rgba(165, 243, 252, 0.1));
-  filter: blur(10px);
-  z-index: 1;
+.imagen img {
+  width: 90%;
+  max-width: 450px;
+  border-radius: 20px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
 }
 
-.logo-img {
-  position: relative;
-  width: 480px; /* 🚗 imagen más grande */
-  height: auto;
-  border-radius: 25px;
-  z-index: 2;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+.titulo {
+  color: #1e3a8a;
+  font-size: 36px;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+
+.descripcion {
+  color: #374151;
+  font-size: 18px;
+  margin-bottom: 30px;
+}
+
+.botones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.boton {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  color: white;
+}
+
+.boton.registrar {
+  background-color: #059669;
+}
+
+.boton.conexion {
+  background-color: #2563eb;
+}
+
+.boton:hover {
+  transform: scale(1.03);
+  opacity: 0.9;
+}
+
+.mensaje-api {
+  margin-top: 20px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.exito {
+  color: #16a34a;
+}
+
+.error {
+  color: #dc2626;
+}
+
+.pendiente {
+  color: #f59e0b;
 }
 </style>

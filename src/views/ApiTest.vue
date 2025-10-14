@@ -4,7 +4,9 @@
       <!-- Columna izquierda -->
       <div class="panel-izquierdo">
         <h1 class="titulo">🌐 Conexión con la API</h1>
-        <p class="descripcion">Verifica la comunicación y consulta los vehículos registrados.</p>
+        <p class="descripcion">
+          Verifica la comunicación y consulta los vehículos registrados.
+        </p>
 
         <div class="botones">
           <button @click="probarConexion" class="btn probar">Probar Conexión</button>
@@ -24,7 +26,10 @@
           </ul>
         </div>
 
-        <p v-else-if="!cargando && probada && !vehiculos.length" class="sin-datos">
+        <p
+          v-else-if="!cargando && probada && !vehiculos.length"
+          class="sin-datos"
+        >
           No hay vehículos registrados o no se pudo obtener la lista.
         </p>
       </div>
@@ -42,13 +47,12 @@ import { ref } from 'vue'
 import axios from 'axios'
 
 const mensaje = ref('')
-const estado = ref('')
 const estadoClase = ref('')
 const vehiculos = ref([])
 const probada = ref(false)
 const cargando = ref(false)
 
-// Probar conexión
+// Probar conexión a la API
 const probarConexion = async () => {
   try {
     mensaje.value = '⏳ Probando conexión...'
@@ -56,7 +60,7 @@ const probarConexion = async () => {
     probada.value = true
     cargando.value = true
 
-    const response = await axios.get('http://apirecoleccion.gonzaloandreslucio.com/api')
+    const response = await axios.get('http://apirecoleccion.gonzaloandreslucio.com/api/calles')
     if (response.status === 200) {
       mensaje.value = '✅ Conexión exitosa con la API'
       estadoClase.value = 'exito'
@@ -72,7 +76,7 @@ const probarConexion = async () => {
   }
 }
 
-// Listar vehículos
+// Listar vehículos (requiere autenticación o endpoint correcto)
 const listarVehiculos = async () => {
   try {
     mensaje.value = '⏳ Obteniendo lista de vehículos...'
@@ -86,7 +90,8 @@ const listarVehiculos = async () => {
     mensaje.value = `✅ Se obtuvieron ${vehiculos.value.length} vehículos`
     estadoClase.value = 'exito'
   } catch (error) {
-    mensaje.value = '⚠️ No se pudo obtener la lista de vehículos.'
+    mensaje.value =
+      '⚠️ No se pudo obtener la lista de vehículos. Puede requerir perfil o autenticación.'
     estadoClase.value = 'error'
   } finally {
     cargando.value = false
