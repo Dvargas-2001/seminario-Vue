@@ -53,7 +53,9 @@ const cargarRutas = async () => {
           weight: 4,
         }).addTo(rutasLayer)
 
-        L.marker(ruta.coordenadas[0]).addTo(rutasLayer).bindPopup(`Inicio: ${ruta.nombre}`)
+        L.marker(ruta.coordenadas[0])
+          .addTo(rutasLayer)
+          .bindPopup(`Inicio: ${ruta.nombre}`)
         L.marker(ruta.coordenadas[ruta.coordenadas.length - 1])
           .addTo(rutasLayer)
           .bindPopup(`Fin: ${ruta.nombre}`)
@@ -77,9 +79,44 @@ onMounted(() => {
 <style scoped>
 .mapa-container {
   padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .titulo {
   text-align: center;
   color: #1e3a8a;
-  font
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.mapa {
+  width: 100%;
+  height: 500px;
+  border: 2px solid #1e3a8a;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+.acciones {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.boton-recargar {
+  background-color: #1e3a8a;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.boton-recargar:hover {
+  background-color: #3b5bb5;
+}
+</style>
