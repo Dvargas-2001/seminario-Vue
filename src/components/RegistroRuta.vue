@@ -9,56 +9,30 @@
       <!-- DERECHA: FORMULARIO -->
       <div class="form-card">
         <h1 class="titulo">🗺️ Registro de Rutas</h1>
-        <p class="descripcion">Agrega y administra las rutas asignadas a los vehículos.</p>
+        <p class="descripcion">
+          Agrega y administra las rutas asignadas a los vehículos.
+        </p>
 
         <form @submit.prevent="registrarRuta" class="formulario">
-          <!-- CAMPO NOMBRE DE RUTA -->
           <div class="campo">
-            <input
-              type="text"
-              v-model="nombre"
-              placeholder="Nombre de la ruta"
-              required
-            />
+            <input type="text" v-model="nombre" placeholder="Nombre de la ruta" required />
           </div>
 
-          <!-- CAMPO ORIGEN -->
           <div class="campo">
-            <input
-              type="text"
-              v-model="origen"
-              placeholder="Punto de origen"
-              required
-            />
+            <input type="text" v-model="origen" placeholder="Punto de origen" required />
           </div>
 
-          <!-- CAMPO DESTINO -->
           <div class="campo">
-            <input
-              type="text"
-              v-model="destino"
-              placeholder="Punto de destino"
-              required
-            />
+            <input type="text" v-model="destino" placeholder="Punto de destino" required />
           </div>
 
-          <!-- CAMPO DISTANCIA -->
           <div class="campo">
-            <input
-              type="number"
-              v-model="distancia"
-              placeholder="Distancia (km)"
-              required
-            />
+            <input type="number" v-model="distancia" placeholder="Distancia (km)" required />
           </div>
 
-          <!-- BOTÓN REGISTRAR -->
-          <button type="submit" class="boton-registrar">
-            Registrar Ruta
-          </button>
+          <button type="submit" class="boton-registrar">Registrar Ruta</button>
 
-          <!-- MENSAJE DE ESTADO -->
-          <p v-if="mensaje" :class="estado">{{ mensaje }}</p>
+          <p v-if="mensaje" :class="estado" class="mensaje">{{ mensaje }}</p>
         </form>
       </div>
     </div>
@@ -66,38 +40,48 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import axios from 'axios'
+import { ref } from "vue";
+import { crearRuta } from "@/services/rutasService.js";
 
-const nombre = ref('')
-const origen = ref('')
-const destino = ref('')
-const distancia = ref('')
-const mensaje = ref('')
-const estado = ref('')
+const nombre = ref("");
+const origen = ref("");
+const destino = ref("");
+const distancia = ref("");
+const mensaje = ref("");
+const estado = ref("");
 
 const registrarRuta = async () => {
-  try {
-    const nuevaRuta = {
-      nombre: nombre.value,
-      origen: origen.value,
-      destino: destino.value,
-      distancia: distancia.value
-    }
+  mensaje.value = "";
+  estado.value = "";
 
-    // Intenta enviar a la API
-    await axios.post('http://apirecoleccion.gonzaloandreslucio.com/api/rutas', nuevaRuta)
-
-    mensaje.value = '✅ Ruta registrada correctamente'
-    estado.value = 'exito'
-
-    nombre.value = origen.value = destino.value = distancia.value = ''
-  } catch (error) {
-    mensaje.value = '⚠️ No se pudo conectar a la API. Guardado localmente.'
-    estado.value = 'error'
-    console.error(error)
+  if (!nombre.value || !origen.value || !destino.value || !distancia.value) {
+    mensaje.value = "⚠️ Todos los campos son obligatorios.";
+    estado.value = "error";
+    return;
   }
-}
+
+  const nuevaRuta = {
+    nombre: nombre.value,
+    punto_origen: origen.value,
+    punto_destino: destino.value,
+    distancia_km: distancia.value,
+  };
+
+  try {
+    const respuesta = await crearRuta(nuevaRuta);
+    console.log("Ruta creada:", respuesta);
+
+    mensaje.value = "✅ Ruta registrada correctamente.";
+    estado.value = "exito";
+
+    // limpiar campos
+    nombre.value = origen.value = destino.value = distancia.value = "";
+  } catch (error) {
+    console.error("Error al registrar la ruta:", error);
+    mensaje.value = "❌ No se pudo registrar la ruta. Verifica la API o los datos.";
+    estado.value = "error";
+  }
+};
 </script>
 
 <style scoped>
@@ -120,7 +104,6 @@ const registrarRuta = async () => {
   flex-wrap: wrap;
 }
 
-/* IMAGEN IZQUIERDA */
 .imagen {
   flex: 1;
   display: flex;
@@ -134,7 +117,6 @@ const registrarRuta = async () => {
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
 }
 
-/* FORMULARIO DERECHA */
 .form-card {
   background: white;
   border-radius: 20px;
@@ -164,7 +146,6 @@ const registrarRuta = async () => {
   gap: 20px;
 }
 
-/* Campos de texto */
 .campo {
   background: #f1f5f9;
   border-radius: 12px;
@@ -185,7 +166,6 @@ input {
   color: #111827;
 }
 
-/* Botón */
 .boton-registrar {
   background-color: #059669;
   color: white;
@@ -202,16 +182,16 @@ input {
   transform: scale(1.03);
 }
 
-/* Mensajes */
-.exito {
-  color: #16a34a;
+.mensaje {
   margin-top: 15px;
   font-weight: 600;
 }
 
+.exito {
+  color: #16a34a;
+}
+
 .error {
   color: #dc2626;
-  margin-top: 15px;
-  font-weight: 600;
 }
 </style>

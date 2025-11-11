@@ -1,179 +1,143 @@
 <template>
-  <div class="registro-container">
-    <div class="form-card">
-      <h1 class="titulo">🚗 Registro de Nuevo Vehículo</h1>
-      <p class="descripcion">Agrega los datos del vehículo para su control y seguimiento.</p>
+  <div class="registro-vehiculo">
+    <h2>Registro de Vehículo</h2>
 
-      <form @submit.prevent="registrarVehiculo" class="formulario">
-        <!-- CAMPO PLACA -->
-        <div class="campo">
-          <img src="@/assets/placa.png" alt="Ícono Placa" class="icono" />
-          <input
-            type="text"
-            v-model="placa"
-            placeholder="Ingrese la placa del vehículo"
-            required
-          />
-        </div>
+    <form @submit.prevent="registrarVehiculo">
+      <div class="campo">
+        <label>Placa:</label>
+        <input v-model.trim="vehiculo.placa" required placeholder="Ej: ABC123" />
+      </div>
 
-        <!-- CAMPO CAPACIDAD -->
-        <div class="campo">
-          <img src="@/assets/capacidad.png" alt="Ícono Capacidad" class="icono" />
-          <input
-            type="number"
-            v-model="capacidad"
-            placeholder="Capacidad del vehículo (kg o pasajeros)"
-            required
-          />
-        </div>
+      <div class="campo">
+        <label>Modelo:</label>
+        <input v-model.trim="vehiculo.modelo" required placeholder="Ej: Toyota Corolla" />
+      </div>
 
-        <!-- CAMPO TIPO -->
-        <div class="campo">
-          <img src="@/assets/tipodevehiculo.png" alt="Ícono Tipo" class="icono" />
-          <input
-            type="text"
-            v-model="tipo"
-            placeholder="Tipo de vehículo (ej. Camión, Moto, Auto)"
-            required
-          />
-        </div>
+      <div class="campo">
+        <label>Propietario:</label>
+        <input v-model.trim="vehiculo.propietario" required placeholder="Ej: Gilary Vargas" />
+      </div>
 
-        <!-- BOTÓN REGISTRAR -->
-        <button type="submit" class="boton-registrar">
-          Registrar Vehículo
-        </button>
+      <div class="campo">
+        <label>Estado:</label>
+        <select v-model="vehiculo.estado" required>
+          <option value="">Seleccione...</option>
+          <option>Activo</option>
+          <option>Inactivo</option>
+          <option>En mantenimiento</option>
+        </select>
+      </div>
 
-        <!-- MENSAJE DE ESTADO -->
-        <p v-if="mensaje" :class="estado">{{ mensaje }}</p>
-      </form>
-    </div>
+      <button type="submit" class="btn-guardar">Registrar Vehículo</button>
+    </form>
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue'
-import axios from 'axios'
+<script>
+export default {
+  name: "RegistroVehiculo",
+  data() {
+    return {
+      vehiculo: {
+        placa: "",
+        modelo: "",
+        propietario: "",
+        estado: ""
+      }
+    };
+  },
+  methods: {
+    registrarVehiculo() {
+      // Validaciones básicas
+      if (!this.vehiculo.placa || !this.vehiculo.modelo || !this.vehiculo.propietario || !this.vehiculo.estado) {
+        alert("⚠️ Todos los campos son obligatorios.");
+        return;
+      }
 
-const placa = ref('')
-const capacidad = ref('')
-const tipo = ref('')
-const mensaje = ref('')
-const estado = ref('')
+      // Validar formato de placa (3 letras y 3 números, ejemplo: ABC123)
+      const placaValida = /^[A-Z]{3}\d{3}$/i.test(this.vehiculo.placa);
+      if (!placaValida) {
+        alert("⚠️ La placa debe tener el formato ABC123 (3 letras y 3 números).");
+        return;
+      }
 
-const registrarVehiculo = async () => {
-  try {
-    const nuevoVehiculo = { placa: placa.value, capacidad: capacidad.value, tipo: tipo.value }
+      // Verificar si ya existe una placa igual en LocalStorage
+      const vehiculos = JSON.parse(localStorage.getItem("vehiculos")) || [];
+      const placaExistente = vehiculos.find(v => v.placa.toUpperCase() === this.vehiculo.placa.toUpperCase());
+      if (placaExistente) {
+        alert("⚠️ Esta placa ya está registrada.");
+        return;
+      }
 
-    // Intenta enviar a la API
-    await axios.post('http://apirecoleccion.gonzaloandreslucio.com/api/vehiculos', nuevoVehiculo)
+      // Si pasa las validaciones, registrar el vehículo
+      const nuevoVehiculo = {
+        id: Date.now(),
+        ...this.vehiculo
+      };
 
-    mensaje.value = '✅ Vehículo registrado correctamente'
-    estado.value = 'exito'
-    placa.value = capacidad.value = tipo.value = ''
-  } catch (error) {
-    mensaje.value = '⚠️ No se pudo conectar a la API. Guardado localmente.'
-    estado.value = 'error'
-    console.error(error)
+      vehiculos.push(nuevoVehiculo);
+      localStorage.setItem("vehiculos", JSON.stringify(vehiculos));
+
+      alert("✅ Vehículo registrado correctamente.");
+
+      // Limpiar formulario
+      this.vehiculo = {
+        placa: "",
+        modelo: "",
+        propietario: "",
+        estado: ""
+      };
+    }
   }
-}
+};
 </script>
 
 <style scoped>
-.registro-container {
-  min-height: 100vh;
-  background: linear-gradient(120deg, #f8fafc 0%, #e6fff7 100%);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding-top: 120px;
-}
-
-.form-card {
-  background: white;
-  border-radius: 20px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-  padding: 40px;
-  width: 100%;
+.registro-vehiculo {
   max-width: 500px;
+  margin: 40px auto;
+  padding: 25px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
   text-align: center;
+  color: #007bff;
 }
 
-.titulo {
-  color: #1e3a8a;
-  font-size: 30px;
-  font-weight: 800;
-  margin-bottom: 10px;
+.campo {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
 }
 
-.descripcion {
-  color: #4b5563;
-  margin-bottom: 30px;
+label {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+input,
+select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
   font-size: 15px;
 }
 
-.formulario {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-/* Campos */
-.campo {
-  display: flex;
-  align-items: center;
-  background: #f1f5f9;
-  border-radius: 12px;
-  padding: 12px 15px;
-  transition: all 0.3s ease; /* 🔹 duración + suavizado */
-}
-
-.campo:hover {
-  background: #e0f2fe;
-}
-
-.icono {
-  width: 30px;
-  height: 30px;
-  margin-right: 10px;
-  opacity: 0.8;
-}
-
-input {
-  flex: 1;
-  border: none;
-  background: transparent;
-  outline: none;
-  font-size: 16px;
-  color: #111827;
-}
-
-/* Botón */
-.boton-registrar {
-  background-color: #059669;
+.btn-guardar {
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff;
   color: white;
-  font-weight: 600;
   border: none;
-  border-radius: 10px;
-  padding: 14px;
+  border-radius: 6px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  font-size: 16px;
 }
 
-.boton-registrar:hover {
-  background-color: #047857;
-  transform: scale(1.03);
-}
-
-/* Mensajes */
-.exito {
-  color: #16a34a;
-  margin-top: 15px;
-  font-weight: 600;
-}
-
-.error {
-  color: #dc2626;
-  margin-top: 15px;
-  font-weight: 600;
+.btn-guardar:hover {
+  background-color: #0056b3;
 }
 </style>

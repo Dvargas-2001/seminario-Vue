@@ -1,122 +1,97 @@
 <template>
-  <div class="mapa-container">
-    <h2 class="titulo">Mapa de Rutas - Buenaventura</h2>
+  <div class="mapa-contenedor">
+    <h2 class="titulo">🗺️ Mapa de Vehículos Registrados</h2>
+    <p class="descripcion">Visualiza los vehículos registrados en el sistema sobre el mapa.</p>
+
     <div id="map" class="mapa"></div>
 
-    <!-- Botón de actualización -->
-    <div class="acciones">
-      <button @click="cargarRutas" class="boton-recargar">🔄 Actualizar Rutas</button>
+    <div v-if="vehiculos.length === 0" class="sin-datos">
+      ⚠️ No hay vehículos registrados para mostrar.
     </div>
   </div>
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
-import axios from 'axios'
-import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
+import { onMounted, ref } from "vue";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 
-const map = ref(null)
-let rutasLayer = null
+const vehiculos = ref([]);
 
-// Función para inicializar el mapa
-const inicializarMapa = () => {
-  map.value = L.map('map').setView([3.8777, -77.0317], 13)
-
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
-  }).addTo(map.value)
-}
-
-// Función para cargar las rutas desde la API
-const cargarRutas = async () => {
-  try {
-    if (!map.value) return
-
-    // Elimina rutas anteriores
-    if (rutasLayer) {
-      map.value.removeLayer(rutasLayer)
-    }
-
-    // Petición a la API (ajusta el endpoint según el backend del profesor)
-    const response = await axios.get('http://apirecoleccion.gonzaloandreslucio.com/api/rutas')
-    const rutas = response.data
-
-    // Capa para agrupar rutas
-    rutasLayer = L.layerGroup().addTo(map.value)
-
-    rutas.forEach((ruta) => {
-      // Cada ruta puede tener coordenadas en formato [[lat1, lng1], [lat2, lng2], ...]
-      if (ruta.coordenadas && ruta.coordenadas.length > 1) {
-        const polyline = L.polyline(ruta.coordenadas, {
-          color: 'blue',
-          weight: 4,
-        }).addTo(rutasLayer)
-
-        L.marker(ruta.coordenadas[0])
-          .addTo(rutasLayer)
-          .bindPopup(`Inicio: ${ruta.nombre}`)
-        L.marker(ruta.coordenadas[ruta.coordenadas.length - 1])
-          .addTo(rutasLayer)
-          .bindPopup(`Fin: ${ruta.nombre}`)
-
-        map.value.fitBounds(polyline.getBounds())
-      }
-    })
-  } catch (error) {
-    console.error('Error cargando rutas:', error)
-    alert('❌ No se pudieron cargar las rutas desde la API.')
-  }
-}
-
-// Inicializar al montar el componente
+// Inicializar mapa cuando se monta el componente
 onMounted(() => {
-  inicializarMapa()
-  cargarRutas()
-})
+  const data = JSON.parse(localStorage.getItem("vehiculos")) || [];
+  vehiculos.value = data;
+
+  // Crear el mapa centrado en Buenaventura (por defecto)
+  const mapa = L.map("map").setView([3.8773, -77.0260], 13);
+
+  // Cargar el mapa base de OpenStreetMap
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "© OpenStreetMap contributors"
+  }).addTo(mapa);
+
+  // Icono personalizado para los vehículos
+  const iconoVehiculo = L.icon({
+    iconUrl: "https://cdn-icons-png.flaticon.com/512/854/854894.png",
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+    popupAnchor: [0, -28],
+  });
+
+  // Agregar marcadores para cada vehículo
+  if (vehiculos.value.length > 0) {
+    vehiculos.value.forEach((v, i) => {
+      // Asigna una ubicación simulada cerca del centro (para visualización)
+      const lat = 3.8773 + (Math.random() - 0.5) * 0.01;
+      const lon = -77.0260 + (Math.random() - 0.5) * 0.01;
+
+      L.marker([lat, lon], { icon: iconoVehiculo })
+        .addTo(mapa)
+        .bindPopup(`
+          <strong>🚗 ${v.placa}</strong><br>
+          Modelo: ${v.modelo}<br>
+          Propietario: ${v.propietario}<br>
+          Estado: ${v.estado}
+        `);
+    });
+  }
+});
 </script>
 
 <style scoped>
-.mapa-container {
+.mapa-contenedor {
+  max-width: 1000px;
+  margin: 40px auto;
   padding: 20px;
-  max-width: 800px;
-  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .titulo {
   text-align: center;
   color: #1e3a8a;
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 15px;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.descripcion {
+  text-align: center;
+  color: #374151;
+  margin-bottom: 20px;
 }
 
 .mapa {
-  width: 100%;
   height: 500px;
-  border: 2px solid #1e3a8a;
-  border-radius: 8px;
-  margin-bottom: 15px;
+  width: 100%;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
 
-.acciones {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-}
-
-.boton-recargar {
-  background-color: #1e3a8a;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.3s ease;
-}
-
-.boton-recargar:hover {
-  background-color: #3b5bb5;
+.sin-datos {
+  text-align: center;
+  margin-top: 10px;
+  color: #6b7280;
 }
 </style>

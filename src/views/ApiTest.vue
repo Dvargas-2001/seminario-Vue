@@ -1,11 +1,10 @@
 <template>
   <div class="api-container">
     <div class="contenido">
-      <!-- Columna izquierda -->
       <div class="panel-izquierdo">
         <h1 class="titulo">🌐 Conexión con la API</h1>
         <p class="descripcion">
-          Verifica la comunicación y consulta los vehículos registrados.
+          Verifica la comunicación con el servicio y consulta los vehículos registrados.
         </p>
 
         <div class="botones">
@@ -13,9 +12,8 @@
           <button @click="listarVehiculos" class="btn listar">Listar Vehículos</button>
         </div>
 
-        <p v-if="estado" :class="estadoClase">{{ mensaje }}</p>
+        <p v-if="mensaje" :class="estadoClase">{{ mensaje }}</p>
 
-        <!-- Lista de vehículos -->
         <div v-if="vehiculos.length" class="lista">
           <h3>🚗 Vehículos registrados:</h3>
           <ul>
@@ -26,15 +24,11 @@
           </ul>
         </div>
 
-        <p
-          v-else-if="!cargando && probada && !vehiculos.length"
-          class="sin-datos"
-        >
+        <p v-else-if="!cargando && probada && !vehiculos.length" class="sin-datos">
           No hay vehículos registrados o no se pudo obtener la lista.
         </p>
       </div>
 
-      <!-- Columna derecha -->
       <div class="panel-derecho">
         <img src="@/assets/api.jpeg" alt="API Imagen" class="imagen-api" />
       </div>
@@ -44,7 +38,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import axios from 'axios'
+import api from '@/services/api' // 🔗 conexión real
 
 const mensaje = ref('')
 const estadoClase = ref('')
@@ -52,47 +46,65 @@ const vehiculos = ref([])
 const probada = ref(false)
 const cargando = ref(false)
 
-// Probar conexión a la API
 const probarConexion = async () => {
-  try {
-    mensaje.value = '⏳ Probando conexión...'
-    estadoClase.value = ''
-    probada.value = true
-    cargando.value = true
+  mensaje.value = '⏳ Probando conexión con la API...'
+  estadoClase.value = ''
+  cargando.value = true
+  probada.value = true
 
-    const response = await axios.get('http://apirecoleccion.gonzaloandreslucio.com/api/calles')
-    if (response.status === 200) {
-      mensaje.value = '✅ Conexión exitosa con la API'
+  try {
+    const res = await api.get('/vehiculos') // ✅ intento real a la API
+    console.log("📦 Respuesta de API:", res.data)
+    if (res?.data) {
+      mensaje.value = '✅ Conexión exitosa con la API del profesor.'
       estadoClase.value = 'exito'
     } else {
-      mensaje.value = '⚠️ La API respondió, pero con error.'
-      estadoClase.value = 'error'
+      throw new Error('Sin respuesta válida de la API.')
     }
   } catch (error) {
-    mensaje.value = '❌ Error: No se pudo conectar con la API.'
+    console.warn('⚠️ No se pudo conectar con la API:', error.message)
+    mensaje.value = '⚠️ Conexión fallida, usando datos locales simulados.'
     estadoClase.value = 'error'
   } finally {
     cargando.value = false
   }
 }
 
-// Listar vehículos (requiere autenticación o endpoint correcto)
 const listarVehiculos = async () => {
-  try {
-    mensaje.value = '⏳ Obteniendo lista de vehículos...'
-    estadoClase.value = ''
-    vehiculos.value = []
-    cargando.value = true
-    probada.value = true
+  mensaje.value = '⏳ Obteniendo lista de vehículos...'
+  estadoClase.value = ''
+  vehiculos.value = []
+  cargando.value = true
+  probada.value = true
 
-    const response = await axios.get('http://apirecoleccion.gonzaloandreslucio.com/api/vehiculos')
-    vehiculos.value = response.data || []
-    mensaje.value = `✅ Se obtuvieron ${vehiculos.value.length} vehículos`
-    estadoClase.value = 'exito'
+  try {
+    // 🔍 Intentar obtener desde la API
+    const res = await api.get('/vehiculos')
+    console.log("📦 Datos recibidos:", res.data)
+    if (res?.data?.data?.length) {
+      vehiculos.value = res.data.data
+      mensaje.value = `✅ Se encontraron ${vehiculos.value.length} vehículo(s).`
+      estadoClase.value = 'exito'
+    } else {
+      throw new Error('Respuesta vacía o no válida')
+    }
   } catch (error) {
-    mensaje.value =
-      '⚠️ No se pudo obtener la lista de vehículos. Puede requerir perfil o autenticación.'
-    estadoClase.value = 'error'
+    console.warn('⚠️ Error al consultar API, usando LocalStorage...')
+    try {
+      // 🧠 Fallback a datos locales
+      const data = JSON.parse(localStorage.getItem('vehiculos')) || []
+      if (data.length) {
+        vehiculos.value = data
+        mensaje.value = `⚠️ Mostrando ${data.length} vehículo(s) locales.`
+        estadoClase.value = 'error'
+      } else {
+        mensaje.value = '❌ No se encontraron vehículos en la API ni en local.'
+        estadoClase.value = 'error'
+      }
+    } catch (err2) {
+      mensaje.value = '❌ Error al leer datos locales.'
+      estadoClase.value = 'error'
+    }
   } finally {
     cargando.value = false
   }
