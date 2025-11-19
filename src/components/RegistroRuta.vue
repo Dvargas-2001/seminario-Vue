@@ -137,10 +137,10 @@ export default {
 
       try {
         await crearRuta(this.form);
-        this.mensaje = "Ruta registrada correctamente ✔️";
+        this.mensaje = "Ruta registrada correctamente ";
         await this.cargarRutas();
       } catch (error) {
-        this.mensaje = "Error al registrar la ruta ❌ (ver consola)";
+        this.mensaje = "Error al registrar la ruta  (ver consola)";
       } finally {
         this.loading = false;
       }

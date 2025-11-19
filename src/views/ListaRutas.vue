@@ -25,7 +25,7 @@ onMounted(() => {
 
 function onRutaCreada() {
   mostrarFormulario.value = false;
-  cargarRutas(); // refrescar lista
+  cargarRutas(); 
 }
 </script>
 

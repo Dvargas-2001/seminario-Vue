@@ -50,7 +50,6 @@ const vehiculos = ref([]);
 const probada = ref(false);
 const cargando = ref(false);
 
-// 🔵 Simulación local (fallback)
 const vehiculosSimulados = [
   { id: 1, placa: "ABC123", modelo: "Camión Recolector" },
   { id: 2, placa: "XYZ987", modelo: "Compactador" },
@@ -58,7 +57,7 @@ const vehiculosSimulados = [
 ];
 
 const probarConexion = async () => {
-  mensaje.value = "⏳ Probando conexión con la API...";
+  mensaje.value = " Probando conexión con la API...";
   estadoClase.value = "";
   cargando.value = true;
   probada.value = true;
@@ -66,13 +65,13 @@ const probarConexion = async () => {
   try {
     const res = await api.get("/vehiculos");
     if (res?.data) {
-      mensaje.value = "✅ Conexión exitosa con la API.";
+      mensaje.value = "Conexión exitosa con la API.";
       estadoClase.value = "exito";
     } else {
       throw new Error("Respuesta inválida");
     }
   } catch (error) {
-    mensaje.value = "⚠️ No se pudo conectar con la API.";
+    mensaje.value = "No se pudo conectar con la API.";
     estadoClase.value = "error";
   } finally {
     cargando.value = false;
@@ -80,7 +79,7 @@ const probarConexion = async () => {
 };
 
 const listarVehiculos = async () => {
-  mensaje.value = "⏳ Obteniendo vehículos...";
+  mensaje.value = " Obteniendo vehículos...";
   estadoClase.value = "";
   vehiculos.value = [];
   probada.value = true;
@@ -91,13 +90,13 @@ const listarVehiculos = async () => {
 
     if (res?.data?.data?.length) {
       vehiculos.value = res.data.data;
-      mensaje.value = `✅ Se encontraron ${vehiculos.value.length} vehículo(s).`;
+      mensaje.value = `Se encontraron ${vehiculos.value.length} vehículo(s).`;
       estadoClase.value = "exito";
     } else {
       throw new Error("Lista vacía");
     }
   } catch (error) {
-    mensaje.value = "⚠️ Error en API, usando datos simulados.";
+    mensaje.value = " Error en API, usando datos simulados.";
     estadoClase.value = "error";
     vehiculos.value = vehiculosSimulados;
   } finally {

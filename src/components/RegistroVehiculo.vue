@@ -49,11 +49,11 @@ export default {
 
         console.log("Respuesta crearVehiculo:", res);
 
-        this.mensaje = "Vehículo registrado correctamente ✔️";
+        this.mensaje = "Vehículo registrado correctamente ";
         this.form.placa = "";
         this.form.modelo = "";
       } catch (error) {
-        this.mensaje = "Error al registrar el vehículo ❌ (ver consola)";
+        this.mensaje = "Error al registrar el vehículo  (ver consola)";
       } finally {
         this.loading = false;
       }

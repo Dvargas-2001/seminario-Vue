@@ -24,12 +24,10 @@ onMounted(() => {
 
   const mapa = L.map("map").setView([3.8773, -77.0260], 13);
 
-  // Cargar el mapa base de OpenStreetMap
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: "© OpenStreetMap contributors"
   }).addTo(mapa);
 
-  // Icono personalizado para los vehículos
   const iconoVehiculo = L.icon({
     iconUrl: "https://cdn-icons-png.flaticon.com/512/854/854894.png",
     iconSize: [32, 32],
@@ -37,17 +35,15 @@ onMounted(() => {
     popupAnchor: [0, -28],
   });
 
-  // Agregar marcadores para cada vehículo
   if (vehiculos.value.length > 0) {
     vehiculos.value.forEach((v, i) => {
-      // Asigna una ubicación simulada cerca del centro (para visualización)
       const lat = 3.8773 + (Math.random() - 0.5) * 0.01;
       const lon = -77.0260 + (Math.random() - 0.5) * 0.01;
 
       L.marker([lat, lon], { icon: iconoVehiculo })
         .addTo(mapa)
         .bindPopup(`
-          <strong>🚗 ${v.placa}</strong><br>
+          <strong> ${v.placa}</strong><br>
           Modelo: ${v.modelo}<br>
           Propietario: ${v.propietario}<br>
           Estado: ${v.estado}

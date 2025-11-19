@@ -22,15 +22,13 @@
   </router-link>
 
   <button @click="probarConexion" class="boton conexion">
-    🔗 Probar Conexión API
+    Probar Conexión API
   </button>
 </div>
 
-        <!-- Mensaje de estado -->
         <p v-if="mensaje" :class="estadoClase" class="mensaje-api">{{ mensaje }}</p>
       </div>
 
-      <!-- Imagen decorativa -->
       <div class="imagen">
         <img src="@/assets/api.jpeg" alt="API Imagen" />
       </div>
@@ -45,22 +43,21 @@ import axios from 'axios'
 const mensaje = ref('')
 const estadoClase = ref('')
 
-// Función para probar la conexión a la API
 const probarConexion = async () => {
   try {
-    mensaje.value = '⏳ Probando conexión...'
+    mensaje.value = 'Probando conexión...'
     estadoClase.value = 'pendiente'
 
     const response = await axios.get('http://apirecoleccion.gonzaloandreslucio.com/api')
     if (response.status === 200) {
-      mensaje.value = '✅ Conexión exitosa con la API'
+      mensaje.value = 'Conexión exitosa con la API'
       estadoClase.value = 'exito'
     } else {
-      mensaje.value = '⚠️ La API respondió, pero con un error'
+      mensaje.value = 'La API respondió, pero con un error'
       estadoClase.value = 'error'
     }
   } catch (error) {
-    mensaje.value = '❌ Error: No se pudo conectar con la API'
+    mensaje.value = 'Error: No se pudo conectar con la API'
     estadoClase.value = 'error'
   }
 }

@@ -46,9 +46,14 @@ const error = ref("");
 async function cargarVehiculos() {
   cargando.value = true;
   error.value = "";
+
+  console.warn("🔎 Cargando vehículos desde API REAL...");
+
   try {
     vehiculos.value = await obtenerVehiculos();
+    console.warn("🔍 Respuesta API:", vehiculos.value);
   } catch (err) {
+    console.error("❌ Error en cargarVehiculos:", err);
     error.value = " No se pudo conectar con la API del profesor.";
   } finally {
     cargando.value = false;
@@ -57,6 +62,7 @@ async function cargarVehiculos() {
 
 async function borrarVehiculo(id) {
   if (!confirm("¿Seguro que deseas eliminar este vehículo?")) return;
+
   try {
     await eliminarVehiculo(id);
     vehiculos.value = vehiculos.value.filter((v) => v.id !== id);

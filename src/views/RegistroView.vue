@@ -97,7 +97,7 @@ const RegistroVehiculo = { // Definimos el objeto del componente primero
         }
 
         // 4. ÉXITO
-        this.mensajeExito = '✅ ¡Vehículo registrado exitosamente!';
+        this.mensajeExito = ' ¡Vehículo registrado exitosamente!';
         console.log('Registro Exitoso:', data);
         
         this.vehiculo = { placa: '', capacidad: 0, tipo: '' };
@@ -106,16 +106,16 @@ const RegistroVehiculo = { // Definimos el objeto del componente primero
         // 5. ERROR
         console.error('Error de registro:', error.response || error);
         
-        let mensaje = '❌ Ocurrió un error. El registro no se completó.';
+        let mensaje = ' Ocurrió un error. El registro no se completó.';
         
         if (error.response) {
             if (error.response.status === 401 || error.response.status === 403) {
-                mensaje = '❌ ERROR: No Autorizado. ¡Revisa tu Token y la URL de la API!';
+                mensaje = ' ERROR: No Autorizado. ¡Revisa tu Token y la URL de la API!';
             } else if (error.response.data && error.response.data.message) {
-                mensaje = '❌ Error de la API: ' + error.response.data.message; 
+                mensaje = ' Error de la API: ' + error.response.data.message; 
             }
         } else {
-            mensaje = `❌ Error de conexión: ${error.message}`;
+            mensaje = ` Error de conexión: ${error.message}`;
         }
         
         this.mensajeError = mensaje;
@@ -124,11 +124,10 @@ const RegistroVehiculo = { // Definimos el objeto del componente primero
   },
 };
 
-export default RegistroVehiculo; // ⬅️ Exportamos el objeto del componente.
+export default RegistroVehiculo; //  Exportamos el objeto del componente.
 </script>
 
 <style scoped>
-/* Estilos para que se vea ordenado */
 .registro-vehiculo-container {
   max-width: 500px;
   margin: 40px auto;

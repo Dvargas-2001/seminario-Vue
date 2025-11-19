@@ -30,11 +30,11 @@ async function guardarRuta() {
 
   try {
     await createRuta(nuevaRuta.value);
-    mensaje.value = "✅ Ruta creada correctamente.";
+    mensaje.value = "Ruta creada correctamente.";
     emit("rutaCreada");
     nuevaRuta.value = { origen: "", destino: "", fecha: "", vehiculo_id: null };
   } catch (error) {
-    mensaje.value = "❌ Error al crear la ruta.";
+    mensaje.value = "Error al crear la ruta.";
   } finally {
     cargando.value = false;
   }
