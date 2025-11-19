@@ -18,12 +18,10 @@ import "leaflet/dist/leaflet.css";
 
 const vehiculos = ref([]);
 
-// Inicializar mapa cuando se monta el componente
 onMounted(() => {
   const data = JSON.parse(localStorage.getItem("vehiculos")) || [];
   vehiculos.value = data;
 
-  // Crear el mapa centrado en Buenaventura (por defecto)
   const mapa = L.map("map").setView([3.8773, -77.0260], 13);
 
   // Cargar el mapa base de OpenStreetMap

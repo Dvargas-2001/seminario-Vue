@@ -1,92 +1,62 @@
 <template>
   <div class="registro-vehiculo">
-    <h2>Registro de Vehículo</h2>
+    <h2>Registrar Vehículo</h2>
 
     <form @submit.prevent="registrarVehiculo">
       <div class="campo">
-        <label>Placa:</label>
-        <input v-model.trim="vehiculo.placa" required placeholder="Ej: ABC123" />
+        <label for="placa">Placa:</label>
+        <input id="placa" v-model="form.placa" required />
       </div>
 
       <div class="campo">
-        <label>Modelo:</label>
-        <input v-model.trim="vehiculo.modelo" required placeholder="Ej: Toyota Corolla" />
+        <label for="modelo">Modelo:</label>
+        <input id="modelo" v-model="form.modelo" required />
       </div>
 
-      <div class="campo">
-        <label>Propietario:</label>
-        <input v-model.trim="vehiculo.propietario" required placeholder="Ej: Gilary Vargas" />
-      </div>
-
-      <div class="campo">
-        <label>Estado:</label>
-        <select v-model="vehiculo.estado" required>
-          <option value="">Seleccione...</option>
-          <option>Activo</option>
-          <option>Inactivo</option>
-          <option>En mantenimiento</option>
-        </select>
-      </div>
-
-      <button type="submit" class="btn-guardar">Registrar Vehículo</button>
+      <button type="submit" :disabled="loading">
+        {{ loading ? "Registrando..." : "Registrar" }}
+      </button>
     </form>
+
+    <p v-if="mensaje" class="mensaje">{{ mensaje }}</p>
   </div>
 </template>
 
 <script>
+import { crearVehiculo } from "../services/vehiculosService";
+
 export default {
-  name: "RegistroVehiculo",
   data() {
     return {
-      vehiculo: {
+      form: {
         placa: "",
-        modelo: "",
-        propietario: "",
-        estado: ""
-      }
+        modelo: ""
+      },
+      loading: false,
+      mensaje: ""
     };
   },
   methods: {
-    registrarVehiculo() {
-      // Validaciones básicas
-      if (!this.vehiculo.placa || !this.vehiculo.modelo || !this.vehiculo.propietario || !this.vehiculo.estado) {
-        alert("⚠️ Todos los campos son obligatorios.");
-        return;
+    async registrarVehiculo() {
+      this.loading = true;
+      this.mensaje = "";
+
+      try {
+        const res = await crearVehiculo({
+          placa: this.form.placa,
+          modelo: this.form.modelo
+        });
+
+        console.log("Respuesta crearVehiculo:", res);
+
+        this.mensaje = "Vehículo registrado correctamente ✔️";
+        this.form.placa = "";
+        this.form.modelo = "";
+      } catch (error) {
+        this.mensaje = "Error al registrar el vehículo ❌ (ver consola)";
+      } finally {
+        this.loading = false;
       }
-
-      // Validar formato de placa (3 letras y 3 números, ejemplo: ABC123)
-      const placaValida = /^[A-Z]{3}\d{3}$/i.test(this.vehiculo.placa);
-      if (!placaValida) {
-        alert("⚠️ La placa debe tener el formato ABC123 (3 letras y 3 números).");
-        return;
-      }
-
-      // Verificar si ya existe una placa igual en LocalStorage
-      const vehiculos = JSON.parse(localStorage.getItem("vehiculos")) || [];
-      const placaExistente = vehiculos.find(v => v.placa.toUpperCase() === this.vehiculo.placa.toUpperCase());
-      if (placaExistente) {
-        alert("⚠️ Esta placa ya está registrada.");
-        return;
-      }
-
-      // Si pasa las validaciones, registrar el vehículo
-      const nuevoVehiculo = {
-        id: Date.now(),
-        ...this.vehiculo
-      };
-
-      vehiculos.push(nuevoVehiculo);
-      localStorage.setItem("vehiculos", JSON.stringify(vehiculos));
-
-      alert("✅ Vehículo registrado correctamente.");
-
-      // Limpiar formulario
-      this.vehiculo = {
-        placa: "",
-        modelo: "",
-        propietario: "",
-        estado: ""
-      };
     }
   }
 };
@@ -94,50 +64,14 @@ export default {
 
 <style scoped>
 .registro-vehiculo {
-  max-width: 500px;
-  margin: 40px auto;
-  padding: 25px;
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  margin: auto;
 }
-
-h2 {
-  text-align: center;
-  color: #007bff;
-}
-
 .campo {
-  margin-bottom: 15px;
-  display: flex;
-  flex-direction: column;
+  margin-bottom: 10px;
 }
-
-label {
+.mensaje {
+  margin-top: 12px;
   font-weight: bold;
-  margin-bottom: 5px;
-}
-
-input,
-select {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 15px;
-}
-
-.btn-guardar {
-  width: 100%;
-  padding: 10px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-.btn-guardar:hover {
-  background-color: #0056b3;
 }
 </style>

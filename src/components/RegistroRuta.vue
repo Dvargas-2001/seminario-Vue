@@ -1,197 +1,167 @@
 <template>
-  <div class="ruta-container">
-    <div class="contenido">
-      <!-- IZQUIERDA: IMAGEN DEL MAPA -->
-      <div class="imagen">
-        <img src="@/assets/ruta.jpeg" alt="Mapa de Ruta" class="mapa" />
+  <div class="registro-ruta">
+    <h2>Registrar Ruta</h2>
+
+    <form @submit.prevent="registrarRuta">
+      
+      <!-- PERFIL -->
+      <div class="campo">
+        <label for="perfil">Perfil:</label>
+        <select id="perfil" v-model="form.id_perfil" required>
+          <option disabled value="">Seleccione un perfil...</option>
+          <option v-for="p in perfiles" :key="p.id" :value="p.id">
+            {{ p.nombre }}
+          </option>
+        </select>
       </div>
 
-      <!-- DERECHA: FORMULARIO -->
-      <div class="form-card">
-        <h1 class="titulo">🗺️ Registro de Rutas</h1>
-        <p class="descripcion">
-          Agrega y administra las rutas asignadas a los vehículos.
-        </p>
-
-        <form @submit.prevent="registrarRuta" class="formulario">
-          <div class="campo">
-            <input type="text" v-model="nombre" placeholder="Nombre de la ruta" required />
-          </div>
-
-          <div class="campo">
-            <input type="text" v-model="origen" placeholder="Punto de origen" required />
-          </div>
-
-          <div class="campo">
-            <input type="text" v-model="destino" placeholder="Punto de destino" required />
-          </div>
-
-          <div class="campo">
-            <input type="number" v-model="distancia" placeholder="Distancia (km)" required />
-          </div>
-
-          <button type="submit" class="boton-registrar">Registrar Ruta</button>
-
-          <p v-if="mensaje" :class="estado" class="mensaje">{{ mensaje }}</p>
-        </form>
+      <!-- VEHÍCULO -->
+      <div class="campo">
+        <label for="vehiculo">Vehículo:</label>
+        <select id="vehiculo" v-model="form.id_vehiculo" required>
+          <option disabled value="">Seleccione un vehículo...</option>
+          <option v-for="v in vehiculos" :key="v.id" :value="v.id">
+            {{ v.placa }} – {{ v.modelo }}
+          </option>
+        </select>
       </div>
+
+      <div class="campo">
+        <label for="calle_inicio">Calle Inicio:</label>
+        <input id="calle_inicio" v-model="form.calle_inicio" required />
+      </div>
+
+      <div class="campo">
+        <label for="calle_fin">Calle Fin:</label>
+        <input id="calle_fin" v-model="form.calle_fin" required />
+      </div>
+
+      <div class="campo">
+        <label for="lat_inicio">Latitud Inicio:</label>
+        <input id="lat_inicio" v-model="form.lat_inicio" required />
+      </div>
+
+      <div class="campo">
+        <label for="lon_inicio">Longitud Inicio:</label>
+        <input id="lon_inicio" v-model="form.lon_inicio" required />
+      </div>
+
+      <div class="campo">
+        <label for="lat_fin">Latitud Fin:</label>
+        <input id="lat_fin" v-model="form.lat_fin" required />
+      </div>
+
+      <div class="campo">
+        <label for="lon_fin">Longitud Fin:</label>
+        <input id="lon_fin" v-model="form.lon_fin" required />
+      </div>
+
+      <!-- ESTADO -->
+      <div class="campo">
+        <label for="estado">Estado:</label>
+        <select id="estado" v-model="form.estado" required>
+          <option value="activo">Activo</option>
+          <option value="inactivo">Inactivo</option>
+        </select>
+      </div>
+
+      <button type="submit" :disabled="loading">
+        {{ loading ? "Registrando..." : "Registrar Ruta" }}
+      </button>
+    </form>
+
+    <p v-if="mensaje" class="mensaje">{{ mensaje }}</p>
+
+    <!-- LISTA DE RUTAS -->
+    <div class="lista-rutas">
+      <h3>Rutas Registradas</h3>
+      <ul>
+        <li v-for="ruta in rutas" :key="ruta.id">
+          <strong>{{ ruta.calle_inicio }} → {{ ruta.calle_fin }}</strong>
+          (Vehículo: {{ ruta.id_vehiculo }})
+        </li>
+      </ul>
     </div>
   </div>
 </template>
 
-<script setup>
-import { ref } from "vue";
-import { crearRuta } from "@/services/rutasService.js";
+<script>
+import { getRutas, crearRuta } from "../services/rutasService";
+import { getPerfiles } from "../services/perfiles";
+import { getVehiculos } from "../services/vehiculosService";
 
-const nombre = ref("");
-const origen = ref("");
-const destino = ref("");
-const distancia = ref("");
-const mensaje = ref("");
-const estado = ref("");
+export default {
+  data() {
+    return {
+      perfiles: [],
+      vehiculos: [],
+      form: {
+        id_perfil: "",
+        id_vehiculo: "",
+        calle_inicio: "",
+        calle_fin: "",
+        lat_inicio: "",
+        lon_inicio: "",
+        lat_fin: "",
+        lon_fin: "",
+        estado: "activo"
+      },
+      rutas: [],
+      loading: false,
+      mensaje: ""
+    };
+  },
 
-const registrarRuta = async () => {
-  mensaje.value = "";
-  estado.value = "";
+  async mounted() {
+    await this.cargarPerfiles();
+    await this.cargarVehiculos();
+    await this.cargarRutas();
+  },
 
-  if (!nombre.value || !origen.value || !destino.value || !distancia.value) {
-    mensaje.value = "⚠️ Todos los campos son obligatorios.";
-    estado.value = "error";
-    return;
-  }
+  methods: {
+    async cargarPerfiles() {
+      this.perfiles = await getPerfiles();
+    },
 
-  const nuevaRuta = {
-    nombre: nombre.value,
-    punto_origen: origen.value,
-    punto_destino: destino.value,
-    distancia_km: distancia.value,
-  };
+    async cargarVehiculos() {
+      this.vehiculos = await getVehiculos();
+    },
 
-  try {
-    const respuesta = await crearRuta(nuevaRuta);
-    console.log("Ruta creada:", respuesta);
+    async cargarRutas() {
+      this.rutas = await getRutas();
+    },
 
-    mensaje.value = "✅ Ruta registrada correctamente.";
-    estado.value = "exito";
+    async registrarRuta() {
+      this.loading = true;
+      this.mensaje = "";
 
-    // limpiar campos
-    nombre.value = origen.value = destino.value = distancia.value = "";
-  } catch (error) {
-    console.error("Error al registrar la ruta:", error);
-    mensaje.value = "❌ No se pudo registrar la ruta. Verifica la API o los datos.";
-    estado.value = "error";
+      try {
+        await crearRuta(this.form);
+        this.mensaje = "Ruta registrada correctamente ✔️";
+        await this.cargarRutas();
+      } catch (error) {
+        this.mensaje = "Error al registrar la ruta ❌ (ver consola)";
+      } finally {
+        this.loading = false;
+      }
+    }
   }
 };
 </script>
 
 <style scoped>
-.ruta-container {
-  min-height: 100vh;
-  background: linear-gradient(120deg, #f8fafc 0%, #e6fff7 100%);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding-top: 100px;
+.registro-ruta {
+  max-width: 600px;
+  margin: auto;
 }
-
-.contenido {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 60px;
-  max-width: 1200px;
-  width: 100%;
-  flex-wrap: wrap;
-}
-
-.imagen {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-}
-
-.mapa {
-  width: 450px;
-  height: auto;
-  border-radius: 20px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-}
-
-.form-card {
-  background: white;
-  border-radius: 20px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-  padding: 40px;
-  width: 100%;
-  max-width: 480px;
-  text-align: center;
-}
-
-.titulo {
-  color: #1e3a8a;
-  font-size: 30px;
-  font-weight: 800;
-  margin-bottom: 10px;
-}
-
-.descripcion {
-  color: #4b5563;
-  margin-bottom: 30px;
-  font-size: 15px;
-}
-
-.formulario {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
 .campo {
-  background: #f1f5f9;
-  border-radius: 12px;
-  padding: 12px 15px;
-  transition: all 0.3s ease;
+  margin-bottom: 12px;
 }
-
-.campo:hover {
-  background: #e0f2fe;
-}
-
-input {
-  width: 100%;
-  border: none;
-  background: transparent;
-  outline: none;
-  font-size: 16px;
-  color: #111827;
-}
-
-.boton-registrar {
-  background-color: #059669;
-  color: white;
-  font-weight: 600;
-  border: none;
-  border-radius: 10px;
-  padding: 14px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.boton-registrar:hover {
-  background-color: #047857;
-  transform: scale(1.03);
-}
-
 .mensaje {
-  margin-top: 15px;
-  font-weight: 600;
+  margin-top: 10px;
+  font-weight: bold;
 }
-
-.exito {
-  color: #16a34a;
-}
-
-.error {
-  color: #dc2626;
+.lista-rutas {
+  margin-top: 20px;
 }
 </style>
