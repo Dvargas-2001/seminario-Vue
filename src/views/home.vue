@@ -1,157 +1,76 @@
 <template>
-  <div class="inicio">
-    <div class="contenido">
-      <div class="texto">
-        <h1 class="titulo">Sistema de Control Vehicular</h1>
-        <p class="descripcion">
-          Control, seguridad y rendimiento para una movilidad eficiente.
-        </p>
+  <main class="home">
+    <h1>Inicio</h1>
 
-        <!-- Botones principales -->
-<div class="botones">
-  <router-link to="/registro-vehiculo" class="boton registrar">
-    Registrar Vehículo
-  </router-link>
+    <button @click="probarConexion" :disabled="cargando">
+      {{ cargando ? "Probando..." : "Probar conexión con la API" }}
+    </button>
 
-  <router-link to="/registro-ruta" class="boton registrar">
-    Registrar Ruta
-  </router-link>
+    <p v-if="mensaje" :class="estadoClase">{{ mensaje }}</p>
 
-  <router-link to="/api-test" class="boton registrar">
-    Ver Lista de Vehículos
-  </router-link>
-
-  <button @click="probarConexion" class="boton conexion">
-    Probar Conexión API
-  </button>
-</div>
-
-        <p v-if="mensaje" :class="estadoClase" class="mensaje-api">{{ mensaje }}</p>
-      </div>
-
-      <div class="imagen">
-        <img src="@/assets/api.jpeg" alt="API Imagen" />
-      </div>
-    </div>
-  </div>
+    <ul v-if="perfiles.length">
+      <li v-for="p in perfiles" :key="p.id || p.nombre">
+        {{ p.nombre || p.descripcion || JSON.stringify(p) }}
+      </li>
+    </ul>
+  </main>
 </template>
 
 <script setup>
 import { ref } from "vue";
-import { getPerfiles } from "@/services/perfilesService";
+import { getPerfiles } from "@/services/perfiles";
 
 const mensaje = ref("");
 const estadoClase = ref("");
+const cargando = ref(false);
+const perfiles = ref([]);
 
 const probarConexion = async () => {
   mensaje.value = "Probando conexión con /perfiles...";
   estadoClase.value = "pendiente";
+  cargando.value = true;
+  perfiles.value = [];
+
   try {
-    const perfiles = await getPerfiles();
-    mensaje.value = `Conexión exitosa. Perfiles recibidos: ${perfiles.length}`;
-    estadoClase.value = "exito";
+    const data = await getPerfiles();
+    perfiles.value = Array.isArray(data) ? data : [];
+    mensaje.value = `Petición realizada. Perfiles recibidos: ${perfiles.value.length}`;
+    estadoClase.value = perfiles.value.length ? "exito" : "pendiente";
   } catch (error) {
     console.error(error);
-    mensaje.value = "Error: No se pudo conectar correctamente con la API (perfiles).";
+    mensaje.value = "Error: no se pudo obtener la lista de perfiles.";
     estadoClase.value = "error";
+  } finally {
+    cargando.value = false;
   }
 };
 </script>
 
 <style scoped>
-.inicio {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(120deg, #f8fafc 0%, #e0f7fa 100%);
-  padding: 50px 20px;
+.home {
+  max-width: 600px;
+  margin: 2rem auto;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
-
-.contenido {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 50px;
-  max-width: 1100px;
-  width: 100%;
-}
-
-.texto {
-  flex: 1;
-}
-
-.imagen {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-}
-
-.imagen img {
-  width: 90%;
-  max-width: 450px;
-  border-radius: 20px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-}
-
-.titulo {
-  color: #1e3a8a;
-  font-size: 36px;
-  font-weight: 800;
-  margin-bottom: 10px;
-}
-
-.descripcion {
-  color: #374151;
-  font-size: 18px;
-  margin-bottom: 30px;
-}
-
-.botones {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.boton {
-  padding: 12px 20px;
+button {
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
   border: none;
-  border-radius: 10px;
   cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  text-decoration: none;
+  background: #2ecc71;
   color: white;
 }
-
-.boton.registrar {
-  background-color: #059669;
+button[disabled] {
+  opacity: 0.6;
+  cursor: default;
 }
-
-.boton.conexion {
-  background-color: #2563eb;
+p.exito {
+  color: #27ae60;
 }
-
-.boton:hover {
-  transform: scale(1.03);
-  opacity: 0.9;
+p.error {
+  color: #c0392b;
 }
-
-.mensaje-api {
-  margin-top: 20px;
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.exito {
-  color: #16a34a;
-}
-
-.error {
-  color: #dc2626;
-}
-
-.pendiente {
-  color: #f59e0b;
+p.pendiente {
+  color: #f39c12;
 }
 </style>

@@ -38,52 +38,49 @@
 </template>
 
 <script>
-import { crearVehiculo } from "../services/vehiculosService";
+import { registrarVehiculo } from "@/services/vehiculosService";
 
 export default {
   data() {
     return {
       form: {
         placa: "",
-        capacidad: null,
-        tipo: "",
+        marca: "",
+        modelo: "",
+        activo: true,
+        perfil_id: "",
       },
       loading: false,
       mensaje: "",
     };
   },
+
   methods: {
-    async registrarVehiculo() {
+    async registrar() {
       this.loading = true;
       this.mensaje = "";
 
       try {
-        const res = await crearVehiculo({ ...this.form });
-        console.log("Respuesta crearVehiculo:", res);
-        this.mensaje = " Vehículo registrado correctamente.";
-        this.form = { placa: "", capacidad: null, tipo: "" };
+        const respuesta = await registrarVehiculo(this.form);
+        console.log("Registrado:", respuesta);
+
+        this.mensaje = "Vehículo registrado correctamente.";
+
+        // limpiar campos
+        this.form = {
+          placa: "",
+          marca: "",
+          modelo: "",
+          activo: true,
+          perfil_id: "",
+        };
       } catch (error) {
-        console.error("Error al registrar el vehículo:", error);
-        this.mensaje =
-          " Error al registrar el vehículo. Revisa la consola para más detalles.";
+        console.error(error);
+        this.mensaje = "Error al registrar el vehículo.";
       } finally {
         this.loading = false;
       }
-    },
-  },
+    }
+  }
 };
 </script>
-
-<style scoped>
-.registro-vehiculo {
-  max-width: 400px;
-  margin: auto;
-}
-.campo {
-  margin-bottom: 10px;
-}
-.mensaje {
-  margin-top: 12px;
-  font-weight: bold;
-}
-</style>
