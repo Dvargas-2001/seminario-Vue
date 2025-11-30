@@ -9,24 +9,26 @@
 
     <table v-if="vehiculos.length" class="tabla">
       <thead>
-        <tr>
-          <th>ID</th>
-          <th>Placa</th>
-          <th>Modelo</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="v in vehiculos" :key="v.id">
-          <td>{{ v.id }}</td>
-          <td>{{ v.placa }}</td>
-          <td>{{ v.modelo || 'Sin modelo' }}</td>
-          <td>
-            <button class="btn-editar" @click="editarVehiculo(v)"> Editar</button>
-            <button class="btn-eliminar" @click="borrarVehiculo(v.id)"> Eliminar</button>
-          </td>
-        </tr>
-      </tbody>
+  <tr>
+    <th>ID</th>
+    <th>Placa</th>
+    <th>Tipo</th>
+    <th>Capacidad (kg)</th>
+    <th>Acciones</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr v-for="v in vehiculos" :key="v.id">
+    <td>{{ v.id }}</td>
+    <td>{{ v.placa }}</td>
+    <td>{{ v.tipo || "Sin tipo" }}</td>
+    <td>{{ v.capacidad ?? "Sin capacidad" }}</td>
+    <td>
+      <button class="btn-editar" @click="editarVehiculo(v)"> Editar</button>
+      <button class="btn-eliminar" @click="borrarVehiculo(v.id)"> Eliminar</button>
+    </td>
+  </tr>
+</tbody>
     </table>
 
     <div v-else-if="!cargando" class="sin-datos">

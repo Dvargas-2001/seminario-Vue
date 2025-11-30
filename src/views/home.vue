@@ -37,30 +37,25 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import axios from 'axios'
+import { ref } from "vue";
+import { getPerfiles } from "@/services/perfilesService";
 
-const mensaje = ref('')
-const estadoClase = ref('')
+const mensaje = ref("");
+const estadoClase = ref("");
 
 const probarConexion = async () => {
+  mensaje.value = "Probando conexión con /perfiles...";
+  estadoClase.value = "pendiente";
   try {
-    mensaje.value = 'Probando conexión...'
-    estadoClase.value = 'pendiente'
-
-    const response = await axios.get('http://apirecoleccion.gonzaloandreslucio.com/api')
-    if (response.status === 200) {
-      mensaje.value = 'Conexión exitosa con la API'
-      estadoClase.value = 'exito'
-    } else {
-      mensaje.value = 'La API respondió, pero con un error'
-      estadoClase.value = 'error'
-    }
+    const perfiles = await getPerfiles();
+    mensaje.value = `Conexión exitosa. Perfiles recibidos: ${perfiles.length}`;
+    estadoClase.value = "exito";
   } catch (error) {
-    mensaje.value = 'Error: No se pudo conectar con la API'
-    estadoClase.value = 'error'
+    console.error(error);
+    mensaje.value = "Error: No se pudo conectar correctamente con la API (perfiles).";
+    estadoClase.value = "error";
   }
-}
+};
 </script>
 
 <style scoped>

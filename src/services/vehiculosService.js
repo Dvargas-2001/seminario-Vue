@@ -1,17 +1,19 @@
+// src/services/vehiculosService.js
 import api from "./api";
 
-// Obtener vehículos
-export async function obtenerVehiculos() {
+// Registrar un vehículo: POST /vehiculos
+export async function registrarVehiculo(datos) {
   try {
-    const res = await api.get("/vehiculos");
-    return res.data?.data || [];
+    const res = await api.post("/vehiculos", datos);
+    return res.data;
   } catch (error) {
-    console.error("Error al obtener vehículos:", error);
+    console.error(
+      "Error al registrar vehículo:",
+      error.response?.data || error.message
+    );
     throw error;
   }
 }
-
-// Registrar vehículo
 export async function registrarVehiculo(datos) {
   try {
     const res = await api.post("/vehiculos", datos);
@@ -44,16 +46,11 @@ export async function eliminarVehiculo(id) {
   }
 }
 
-// ------------------------------
 // Alias pedidos por el profesor
-// ------------------------------
-
-// Crear vehículo (alias)
 export async function crearVehiculo(datos) {
-  return await registrarVehiculo(datos);
+  return registrarVehiculo(datos);
 }
 
-// Obtener vehículos (alias)
 export async function getVehiculos() {
-  return await obtenerVehiculos();
+  return obtenerVehiculos();
 }

@@ -42,63 +42,40 @@
 
 <script setup>
 import { ref } from "vue";
-import api from "@/services/api"; // API REAL
+import api from "@/services/api";
 
 const mensaje = ref("");
-const estadoClase = ref("");
-const vehiculos = ref([]);
-const probada = ref(false);
+const detalle = ref("");
 const cargando = ref(false);
 
-const vehiculosSimulados = [
-  { id: 1, placa: "ABC123", modelo: "Camión Recolector" },
-  { id: 2, placa: "XYZ987", modelo: "Compactador" },
-  { id: 3, placa: "LMN456", modelo: "Volqueta" },
-];
-
 const probarConexion = async () => {
-  mensaje.value = " Probando conexión con la API...";
-  estadoClase.value = "";
-  cargando.value = true;
-  probada.value = true;
-
-  try {
-    const res = await api.get("/vehiculos");
-    if (res?.data) {
-      mensaje.value = "Conexión exitosa con la API.";
-      estadoClase.value = "exito";
-    } else {
-      throw new Error("Respuesta inválida");
-    }
-  } catch (error) {
-    mensaje.value = "No se pudo conectar con la API.";
-    estadoClase.value = "error";
-  } finally {
-    cargando.value = false;
-  }
-};
-
-const listarVehiculos = async () => {
-  mensaje.value = " Obteniendo vehículos...";
-  estadoClase.value = "";
-  vehiculos.value = [];
-  probada.value = true;
+  mensaje.value = "Probando conexión...";
+  detalle.value = "";
   cargando.value = true;
 
   try {
+    // 👉 llamamos a un endpoint real, por ejemplo /vehiculos
     const res = await api.get("/vehiculos");
 
-    if (res?.data?.data?.length) {
-      vehiculos.value = res.data.data;
-      mensaje.value = `Se encontraron ${vehiculos.value.length} vehículo(s).`;
-      estadoClase.value = "exito";
-    } else {
-      throw new Error("Lista vacía");
-    }
+    mensaje.value = `Conexión exitosa. Status ${res.status}`;
+    detalle.value = JSON.stringify(res.data, null, 2);
   } catch (error) {
-    mensaje.value = " Error en API, usando datos simulados.";
-    estadoClase.value = "error";
-    vehiculos.value = vehiculosSimulados;
+    // 👉 Aquí distinguimos los casos
+    if (error.response) {
+      // El servidor respondió pero con error (401, 403, 404, 500...)
+      mensaje.value = `Error de API: status ${error.response.status}`;
+      detalle.value = JSON.stringify(error.response.data, null, 2);
+    } else if (error.request) {
+      // La petición salió, pero no hubo respuesta (CORS, servidor caído, etc.)
+      mensaje.value = "No se recibió respuesta de la API (posible CORS/HTTPS).";
+      detalle.value = error.message;
+    } else {
+      // Error al armar la petición
+      mensaje.value = "Error al crear la petición a la API.";
+      detalle.value = error.message;
+    }
+
+    console.error("Error en probarConexion:", error);
   } finally {
     cargando.value = false;
   }

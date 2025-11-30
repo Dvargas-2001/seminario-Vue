@@ -9,8 +9,23 @@
       </div>
 
       <div class="campo">
-        <label for="modelo">Modelo:</label>
-        <input id="modelo" v-model="form.modelo" required />
+        <label for="capacidad">Capacidad (kg):</label>
+        <input
+          id="capacidad"
+          v-model.number="form.capacidad"
+          type="number"
+          min="0"
+          required
+        />
+      </div>
+
+      <div class="campo">
+        <label for="tipo">Tipo:</label>
+        <select id="tipo" v-model="form.tipo" required>
+          <option disabled value="">Seleccione un tipo...</option>
+          <option value="Camión">Camión</option>
+          <option value="Volqueta">Volqueta</option>
+        </select>
       </div>
 
       <button type="submit" :disabled="loading">
@@ -30,10 +45,11 @@ export default {
     return {
       form: {
         placa: "",
-        modelo: ""
+        capacidad: null,
+        tipo: "",
       },
       loading: false,
-      mensaje: ""
+      mensaje: "",
     };
   },
   methods: {
@@ -42,23 +58,19 @@ export default {
       this.mensaje = "";
 
       try {
-        const res = await crearVehiculo({
-          placa: this.form.placa,
-          modelo: this.form.modelo
-        });
-
+        const res = await crearVehiculo({ ...this.form });
         console.log("Respuesta crearVehiculo:", res);
-
-        this.mensaje = "Vehículo registrado correctamente ";
-        this.form.placa = "";
-        this.form.modelo = "";
+        this.mensaje = " Vehículo registrado correctamente.";
+        this.form = { placa: "", capacidad: null, tipo: "" };
       } catch (error) {
-        this.mensaje = "Error al registrar el vehículo  (ver consola)";
+        console.error("Error al registrar el vehículo:", error);
+        this.mensaje =
+          " Error al registrar el vehículo. Revisa la consola para más detalles.";
       } finally {
         this.loading = false;
       }
-    }
-  }
+    },
+  },
 };
 </script>
 

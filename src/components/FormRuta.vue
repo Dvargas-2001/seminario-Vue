@@ -53,8 +53,8 @@ async function guardarRuta() {
       <select v-model="nuevaRuta.vehiculo_id" class="border p-2 rounded">
         <option disabled value="">Seleccione un vehículo</option>
         <option v-for="v in vehiculos" :key="v.id" :value="v.id">
-          {{ v.placa }} — {{ v.marca }}
-        </option>
+        {{ v.placa }} — {{ v.tipo }} ({{ v.capacidad }} kg)
+       </option>
       </select>
     </div>
 

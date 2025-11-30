@@ -1,9 +1,9 @@
-import api from "./api";
+import api from "@/api/api";
 
 export const getPerfiles = async () => {
   try {
-    const response = await api.get("/perfiles");
-    return response.data;
+    const res = await api.get("/perfiles");
+    return res.data; 
   } catch (error) {
     console.error("Error al obtener perfiles:", error);
     throw error;
